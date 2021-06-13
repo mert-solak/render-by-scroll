@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { Props } from './renderByScroll.config';
 
-export const RenderByScroll: React.FC<Props> = ({ children, shouldRender: shouldRenderProp = false }) => {
+export const RenderByScroll: React.FC<Props> = ({
+  children,
+  shouldRender: shouldRenderProp = false,
+  className,
+  style,
+}) => {
   const [shouldRender, setShouldRender] = useState(shouldRenderProp);
 
   const elementRef = useRef(null);
@@ -23,5 +28,9 @@ export const RenderByScroll: React.FC<Props> = ({ children, shouldRender: should
     };
   }, [elementRef]);
 
-  return <div ref={elementRef}>{shouldRender && children}</div>;
+  return (
+    <div className={className} style={style} ref={elementRef}>
+      {shouldRender && children}
+    </div>
+  );
 };
