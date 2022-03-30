@@ -7,12 +7,17 @@ export const RenderByScroll: React.FC<Props> = ({
   shouldRender: shouldRenderProp = false,
   className,
   style,
+  instead,
 }) => {
   const [shouldRender, setShouldRender] = useState(shouldRenderProp);
 
   const elementRef = useRef(null);
 
   useEffect(() => {
+    if (elementRef.current === null) {
+      return () => {};
+    }
+
     const intersectionObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -30,7 +35,7 @@ export const RenderByScroll: React.FC<Props> = ({
 
   return (
     <div className={className} style={style} ref={elementRef}>
-      {shouldRender && children}
+      {shouldRender ? children : instead}
     </div>
   );
 };
