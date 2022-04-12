@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { LegacyRef, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Props } from './renderByScroll.config';
 
@@ -8,10 +8,11 @@ export const RenderByScroll: React.FC<Props> = ({
   className,
   style,
   instead,
+  wrapperElement = 'div',
 }) => {
   const [shouldRender, setShouldRender] = useState(shouldRenderProp);
 
-  const elementRef = useRef(null);
+  const elementRef = useRef<HTMLDivElement | HTMLTableRowElement>(null);
 
   useEffect(() => {
     if (elementRef.current === null) {
@@ -33,9 +34,23 @@ export const RenderByScroll: React.FC<Props> = ({
     };
   }, [elementRef]);
 
-  return (
-    <div className={className} style={style} ref={elementRef}>
-      {shouldRender ? children : instead}
-    </div>
-  );
+  const withWrapper = useMemo(() => {
+    switch (wrapperElement) {
+      case 'tr':
+        return (
+          <tr className={className} style={style} ref={elementRef as LegacyRef<HTMLTableRowElement>}>
+            {shouldRender ? children : instead}
+          </tr>
+        );
+
+      default:
+        return (
+          <div className={className} style={style} ref={elementRef}>
+            {shouldRender ? children : instead}
+          </div>
+        );
+    }
+  }, [children, className, instead, shouldRender, style, wrapperElement]);
+
+  return withWrapper;
 };

@@ -5,4 +5,5 @@ export interface Props {
   className?: string | undefined;
   style?: React.CSSProperties | undefined;
   instead?: React.ReactNode | undefined;
+  wrapperElement?: 'div' | 'tr';
 }
