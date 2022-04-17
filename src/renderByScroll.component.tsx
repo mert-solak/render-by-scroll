@@ -4,13 +4,13 @@ import { Props } from './renderByScroll.config';
 
 export const RenderByScroll: React.FC<Props> = ({
   children,
-  shouldRender: shouldRenderProp = false,
+  shouldRender: shouldRenderProp,
   className,
   style,
   instead,
   wrapperElement = 'div',
 }) => {
-  const [shouldRender, setShouldRender] = useState(shouldRenderProp);
+  const [shouldRender, setShouldRender] = useState(shouldRenderProp ?? false);
 
   const elementRef = useRef<HTMLDivElement | HTMLTableRowElement>(null);
 
@@ -33,6 +33,12 @@ export const RenderByScroll: React.FC<Props> = ({
       intersectionObserver.disconnect();
     };
   }, [elementRef]);
+
+  useEffect(() => {
+    if (shouldRenderProp && shouldRender !== shouldRenderProp) {
+      setShouldRender(shouldRenderProp);
+    }
+  }, [shouldRenderProp]);
 
   const withWrapper = useMemo(() => {
     switch (wrapperElement) {
