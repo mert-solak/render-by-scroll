@@ -1,4 +1,4 @@
-import React, { LegacyRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, { LegacyRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 import { Props } from './renderByScroll.config';
 
@@ -14,23 +14,36 @@ export const RenderByScroll: React.FC<Props> = ({
 
   const elementRef = useRef<HTMLDivElement | HTMLTableRowElement>(null);
 
+  const isInViewport = useCallback(() => {
+    if (elementRef?.current === null || elementRef?.current === undefined) {
+      return;
+    }
+
+    const rect = elementRef.current.getBoundingClientRect();
+
+    if (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    ) {
+      setShouldRender(true);
+    }
+  }, [elementRef]);
+
   useEffect(() => {
-    if (elementRef.current === null) {
+    if (elementRef?.current === null || elementRef?.current === undefined) {
       return () => {};
     }
 
-    const intersectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          intersectionObserver.disconnect();
-          setShouldRender(true);
-        }
-      });
-    });
-    intersectionObserver.observe(elementRef.current);
+    window.addEventListener('load', isInViewport);
+    window.addEventListener('scroll', isInViewport);
+    window.addEventListener('resize', isInViewport);
 
     return () => {
-      intersectionObserver.disconnect();
+      window.removeEventListener('load', isInViewport);
+      window.removeEventListener('scroll', isInViewport);
+      window.removeEventListener('resize', isInViewport);
     };
   }, [elementRef]);
 
@@ -39,6 +52,14 @@ export const RenderByScroll: React.FC<Props> = ({
       setShouldRender(shouldRenderProp);
     }
   }, [shouldRenderProp]);
+
+  useEffect(() => {
+    if (shouldRender) {
+      window.removeEventListener('load', isInViewport);
+      window.removeEventListener('scroll', isInViewport);
+      window.removeEventListener('resize', isInViewport);
+    }
+  }, [shouldRender]);
 
   const withWrapper = useMemo(() => {
     switch (wrapperElement) {
