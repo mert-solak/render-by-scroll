@@ -1,8 +1,16 @@
-import React, { LegacyRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, {
+  LegacyRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+  PropsWithChildren,
+} from 'react';
 
 import { Props } from './renderByScroll.config';
 
-export const RenderByScroll: React.FC<Props> = ({
+export const RenderByScroll: React.FC<PropsWithChildren<Props>> = ({
   children,
   shouldRender: shouldRenderProp,
   className,
